@@ -6,6 +6,15 @@ pipeline {
     }
 
     stages {
+        stage('Deploy with Docker Compose') {
+            steps {
+                script {
+                    sh 'docker-compose down || true'
+                    sh 'docker-compose up --build -d'
+                }
+            }
+        }
+
         stage('Initialize') {
             steps {
                 script {

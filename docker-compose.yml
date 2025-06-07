@@ -1,9 +1,11 @@
 version: '3.8'
+
 services:
-  db:
+  database:
+    container_name: papaja-db
     image: postgres:15
     environment:
-      POSTGRES_DB: db
+      POSTGRES_DB: papajadb
       POSTGRES_USER: appuser
       POSTGRES_PASSWORD: apassword
     ports:
@@ -11,18 +13,32 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
-  papaja:
+  app:
+    container_name: papaja-app
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - db
+      - database
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/papajadb
       SPRING_DATASOURCE_USERNAME: appuser
       SPRING_DATASOURCE_PASSWORD: apassword
 
+  jenkins:
+    container_name: papaja-jenkins
+    image: jenkins/jenkins:lts
+    privileged: true
+    user: root
+    ports:
+      - "8081:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+
 volumes:
   db-data:
+  jenkins_home:
