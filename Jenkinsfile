@@ -24,7 +24,7 @@ pipeline {
         stage('Build JAR with Maven') {
             steps {
                 sh 'chmod +x mvnw || true'
-                sh 'mvn clean package -DskipTests -Dbuild.version=${VERSION}'
+                sh './mvn clean package -DskipTests -Dbuild.version=${VERSION}'
             }
         }
 
