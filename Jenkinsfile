@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/7UL0/papaja.git'
+                git branch: 'main', url: 'https://github.com/7UL0/papaja.git'
             }
         }
 
@@ -39,7 +39,7 @@ pipeline {
     post {
         failure {
             echo 'Build failed. Rolling back...'
-            sh 'docker-compose down'
+            sh 'docker compose down || true'
         }
         success {
             echo "Build and deploy succeeded with version ${VERSION}"
