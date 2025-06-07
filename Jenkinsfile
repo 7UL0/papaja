@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        VERSION = "v${env.BUILD_NUMBER}"
+        VERSION = "0.0.1-${BUILD_NUMBER}"
     }
 
     stages {
@@ -24,15 +24,13 @@ pipeline {
         stage('Build JAR with Maven') {
             steps {
                 sh 'chmod +x mvnw || true'
-                sh './mvnw clean package -DskipTests'
+                sh 'mvn clean package -DskipTests -Dbuild.version=${VERSION}'
             }
         }
 
         stage('Build Docker image') {
             steps {
-                script {
-                    sh 'docker build -t papaja-app:${VERSION} .'
-                }
+                sh 'docker build -t papaja-app:${VERSION} .'
             }
         }
 
@@ -46,7 +44,6 @@ pipeline {
             steps {
                 script {
                     sh 'docker-compose up --build -d'
-                    sh 'docker-compose down'
                 }
             }
         }
@@ -64,8 +61,7 @@ pipeline {
             sh 'docker-compose down || true'
             mail to: 'papaja822@gmail.com',
                  subject: "Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "Build nie powiódł się \n\nSprawdź logi: ${env.BUILD_URL}"
+                 body: "Build nie powiódł się.\n\nSprawdź logi: ${env.BUILD_URL}"
         }
     }
-
 }
