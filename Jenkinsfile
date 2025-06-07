@@ -6,7 +6,7 @@ pipeline {
     }
 
     stages {
-        stage('Initialize') {More actions
+        stage('Initialize') {
             steps {
                 script {
                     def dockerHome = tool 'papaja-docker'
