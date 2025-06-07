@@ -38,8 +38,8 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    sh 'docker-compose up --build -d'
-                    sh 'docker-compose down'
+                    sh 'docker compose up --build -d'
+                    sh 'docker compose down'
                 }
             }
         }
@@ -48,7 +48,7 @@ pipeline {
     post {
         failure {
             echo 'Build failed. Rolling back...'
-            sh 'docker-compose down || true'
+            sh 'docker compose down || true'
         }
         success {
             echo "Build and deploy succeeded with version ${VERSION}"
