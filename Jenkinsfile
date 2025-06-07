@@ -2,16 +2,13 @@ pipeline {
     agent any
 
     environment {
-        VERSION = "0.0.1-${BUILD_NUMBER}"
+        VERSION = "v${env.BUILD_NUMBER}"
     }
 
     stages {
         stage('Initialize') {
             steps {
-                script {
-                    def dockerHome = tool 'papaja-docker'
-                    env.PATH = "${dockerHome}/bin:${env.PATH}"
-                }
+                echo "Build version: ${VERSION}"
             }
         }
 
@@ -24,13 +21,15 @@ pipeline {
         stage('Build JAR with Maven') {
             steps {
                 sh 'chmod +x mvnw || true'
-                sh './mvnw clean package -DskipTests -Dbuild.version=${version}'
+                sh './mvnw clean package -DskipTests'
             }
         }
 
         stage('Build Docker image') {
             steps {
-                sh 'docker build -t papaja-app:${VERSION} .'
+                script {
+                    sh "docker build -t papaja-app:${VERSION} ."
+                }
             }
         }
 
@@ -44,6 +43,7 @@ pipeline {
             steps {
                 script {
                     sh 'docker-compose up --build -d'
+                    sh 'docker-compose down'
                 }
             }
         }
@@ -59,9 +59,9 @@ pipeline {
         failure {
             echo 'Build failed. Rolling back...'
             sh 'docker-compose down || true'
-            mail to: 'papaja822@gmail.com',
+            mail to: 'juliuszparchem@gmail.com',
                  subject: "Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "Build nie powiódł się.\n\nSprawdź logi: ${env.BUILD_URL}"
+                 body: "Build nie powiódł się \n\nSprawdź logi: ${env.BUILD_URL}"
         }
     }
 }
