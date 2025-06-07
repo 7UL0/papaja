@@ -21,6 +21,13 @@ pipeline {
             }
         }
 
+        stage('Build JAR with Maven') {
+            steps {
+                sh 'chmod +x mvnw || true'
+                sh './mvnw clean package -DskipTests'
+            }
+        }
+
         stage('Build Docker image') {
             steps {
                 script {
