@@ -6,11 +6,10 @@ pipeline {
     }
 
     stages {
-        stage('Deploy with Docker Compose') {
+        stage('Clean up before deploy') {
             steps {
                 script {
                     sh 'docker-compose down || true'
-                    sh 'docker-compose up --build -d'
                 }
             }
         }
