@@ -6,9 +6,13 @@ pipeline {
     }
 
     stages {
-        stage('Initialize') {
+        stage('Initialize') {More actions
             steps {
-                echo "Build version: ${VERSION}"
+                script {
+                    def dockerHome = tool 'papaja-docker'
+                    env.PATH = "${dockerHome}/bin:${env.PATH}"
+                    echo "Build version: ${VERSION}"
+                }
             }
         }
 
