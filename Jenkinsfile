@@ -6,6 +6,11 @@ pipeline {
     }
 
     stages {
+        stage('Initialize'){
+            def dockerHome = tool 'papaja-docker'
+            env.PATH = "${dockerHome}/bin:${env.PATH}"
+        }
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/7UL0/papaja.git'
