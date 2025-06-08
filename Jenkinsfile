@@ -60,6 +60,7 @@ pipeline {
                 echo "ETAP: STATIC CODE ANALYSIS"
                 echo "Analiza kodu z SonarQube"
                 echo "====================================="
+                sh "docker compose -f docker-compose.full.yml up -d sonarqube"
                 withSonarQubeEnv('Local Sonar') {
                     sh './mvnw sonar:sonar'
                 }
@@ -151,7 +152,7 @@ pipeline {
             echo "Czyszczenie kontenerów i rollback"
             echo "====================================="
             sh 'docker-compose down || true'
-            mail to: 'juliuszparchem@gmail.com',
+            mail to: 'papaja822@gmail.com',
                  subject: "Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                  body: "Build nie powiódł się\n\nSprawdź logi: ${env.BUILD_URL}"
         }
