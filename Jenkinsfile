@@ -41,24 +41,22 @@ pipeline {
             steps {
                 script {
                     echo "\n====================================="
-                    echo "🔍 CHECKING & FREEING USED PORTS"
+                    echo "🔍 SPRAWDZANIE I UBIJANIE KONTENERÓW NA PORTACH"
                     echo "====================================="
 
-                    def portsToCheck = ['8088', '55432']
-                    portsToCheck.each { port ->
-                        def output = sh(script: "lsof -i :${port} -t || true", returnStdout: true).trim()
-                        if (output) {
-                            echo "⚠️ Port ${port} is in use by PID(s): ${output}"
-                            def containers = sh(script: "docker ps -q --filter 'publish=${port}'", returnStdout: true).trim()
-                            if (containers) {
-                                echo "🔨 Killing container(s) using port ${port}: ${containers}"
-                                sh "docker kill ${containers} || true"
-                                sh "docker rm ${containers} || true"
-                            } else {
-                                echo "⚠️ No Docker container found, but process still using port ${port}"
-                            }
+                    def ports = ['8088', '55432']
+                    ports.each { port ->
+                        def containerId = sh(
+                            script: "docker ps --filter 'publish=${port}' --format '{{.ID}}' || true",
+                            returnStdout: true
+                        ).trim()
+
+                        if (containerId) {
+                            echo "⚠️ Port ${port} używany przez kontener ${containerId}, ubijam..."
+                            sh "docker kill ${containerId} || true"
+                            sh "docker rm ${containerId} || true"
                         } else {
-                            echo "✅ Port ${port} is free"
+                            echo "✅ Port ${port} wolny"
                         }
                     }
                 }
