@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15
@@ -8,7 +6,7 @@ services:
       POSTGRES_USER: appuser
       POSTGRES_PASSWORD: apassword
     ports:
-      - "5432:5432"
+      - "55432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
 
@@ -19,19 +17,18 @@ services:
     depends_on:
       - db
     ports:
-      - "8088:8080"
+      - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/db
       SPRING_DATASOURCE_USERNAME: appuser
       SPRING_DATASOURCE_PASSWORD: apassword
 
   jenkins:
-    image: jenkins/jenkins:lts
+    image: jenkins-gmail
     privileged: true
     user: root
     ports:
       - "8081:8080"
-      - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock

@@ -119,9 +119,18 @@ pipeline {
             echo "BUILD SUCCESS"
             echo "Zakończono pomyślnie z wersją ${VERSION}"
             echo "====================================="
+
             mail to: 'papaja822@gmail.com',
                  subject: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "Gratulacje! Build zakończony sukcesem.\n\nSprawdź: ${env.BUILD_URL}"
+                 body: """\
+    Gratulacje! Build zakończony sukcesem.
+
+    Podgląd aplikacji:
+    http://localhost:8080
+
+    Zobacz szczegóły w Jenkinsie:
+    ${env.BUILD_URL}
+    """
         }
 
         failure {
