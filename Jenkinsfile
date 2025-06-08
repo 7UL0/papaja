@@ -6,16 +6,25 @@ pipeline {
     }
 
     stages {
-        stage('Clean up before deploy') {
+
+        stage('CLEANUP') {
             steps {
+                echo "\n====================================="
+                echo "ETAP: CLEANUP"
+                echo "Usuwanie poprzednich kontenerów, jeśli istnieją"
+                echo "====================================="
                 script {
                     sh 'docker-compose down || true'
                 }
             }
         }
 
-        stage('Initialize') {
+        stage('INITIALIZE') {
             steps {
+                echo "\n====================================="
+                echo "ETAP: INITIALIZE"
+                echo "Konfiguracja środowiska i wersji buildu"
+                echo "====================================="
                 script {
                     def dockerHome = tool 'papaja-docker'
                     env.PATH = "${dockerHome}/bin:${env.PATH}"
@@ -24,26 +33,34 @@ pipeline {
             }
         }
 
-        stage('Checkout') {
+        stage('CHECKOUT') {
             steps {
+                echo "\n====================================="
+                echo "ETAP: CHECKOUT"
+                echo "Pobieranie kodu źródłowego z repozytorium"
+                echo "====================================="
                 git branch: 'main', url: 'https://github.com/7UL0/papaja.git'
             }
         }
 
-        stage('Build JAR with Maven') {
+        stage('BUILD JAR') {
             steps {
+                echo "\n====================================="
+                echo "ETAP: BUILD JAR"
+                echo "Budowanie aplikacji Spring Boot przy użyciu Mavena"
+                echo "====================================="
                 sh 'chmod +x mvnw || true'
                 sh './mvnw clean package -DskipTests'
             }
         }
 
-        stage('Free up used ports') {
+        stage('FREE PORTS') {
             steps {
+                echo "\n====================================="
+                echo "ETAP: FREE PORTS"
+                echo "Sprawdzanie i uwalnianie portów: 8088, 5432"
+                echo "====================================="
                 script {
-                    echo "\n====================================="
-                    echo "🔍 SPRAWDZANIE I UBIJANIE KONTENERÓW NA PORTACH"
-                    echo "====================================="
-
                     def ports = ['8088', '5432']
                     ports.each { port ->
                         def containerId = sh(
@@ -52,36 +69,45 @@ pipeline {
                         ).trim()
 
                         if (containerId) {
-                            echo "⚠️ Port ${port} używany przez kontener ${containerId}, ubijam..."
+                            echo "Port ${port} używany przez kontener ${containerId}, zatrzymuję..."
                             sh "docker kill ${containerId} || true"
                             sh "docker rm ${containerId} || true"
                         } else {
-                            echo "✅ Port ${port} wolny"
+                            echo "Port ${port} jest wolny"
                         }
                     }
                 }
             }
         }
 
-        stage('Build Docker image') {
+        stage('BUILD IMAGE') {
             steps {
-                script {
-                    sh "docker build -t papaja-app:${VERSION} ."
-                }
+                echo "\n====================================="
+                echo "ETAP: BUILD IMAGE"
+                echo "Budowanie obrazu Docker z aplikacją"
+                echo "====================================="
+                sh "docker build -t papaja-app:${VERSION} ."
             }
         }
 
-        stage('Run tests') {
+        stage('TESTS') {
             steps {
+                echo "\n====================================="
+                echo "ETAP: TESTS"
+                echo "Testy jednostkowe (placeholder)"
+                echo "====================================="
                 echo 'Tests coming soon...'
             }
         }
 
-        stage('Deploy with Docker Compose') {
+        stage('DEPLOY') {
             steps {
+                echo "\n====================================="
+                echo "ETAP: DEPLOY"
+                echo "Uruchamianie aplikacji z Docker Compose"
+                echo "====================================="
                 script {
                     sh 'docker-compose up --build -d'
-                    sh 'docker-compose down'
                 }
             }
         }
@@ -89,17 +115,24 @@ pipeline {
 
     post {
         success {
-            echo "Build and deploy succeeded with version ${VERSION}"
+            echo "\n====================================="
+            echo "BUILD SUCCESS"
+            echo "Zakończono pomyślnie z wersją ${VERSION}"
+            echo "====================================="
             mail to: 'papaja822@gmail.com',
                  subject: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                  body: "Gratulacje! Build zakończony sukcesem.\n\nSprawdź: ${env.BUILD_URL}"
         }
+
         failure {
-            echo 'Build failed. Rolling back...'
+            echo "\n====================================="
+            echo "BUILD FAILURE"
+            echo "Czyszczenie kontenerów i rollback"
+            echo "====================================="
             sh 'docker-compose down || true'
             mail to: 'juliuszparchem@gmail.com',
                  subject: "Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "Build nie powiódł się \n\nSprawdź logi: ${env.BUILD_URL}"
+                 body: "Build nie powiódł się\n\nSprawdź logi: ${env.BUILD_URL}"
         }
     }
 }
