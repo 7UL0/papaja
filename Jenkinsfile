@@ -126,7 +126,7 @@ pipeline {
     Gratulacje! Build zakończony sukcesem.
 
     Podgląd aplikacji:
-    http://localhost:8080
+    http://localhost:8088
 
     Zobacz szczegóły w Jenkinsie:
     ${env.BUILD_URL}
