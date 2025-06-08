@@ -60,7 +60,6 @@ pipeline {
                 echo "ETAP: STATIC CODE ANALYSIS"
                 echo "Analiza kodu z SonarQube"
                 echo "====================================="
-                sh "docker compose -f docker-compose.full.yml up -d sonarqube"
                 withSonarQubeEnv('Local Sonar') {
                     sh './mvnw sonar:sonar'
                 }
