@@ -54,17 +54,17 @@ pipeline {
             }
         }
 
-        stage('STATIC CODE ANALYSIS') {
-            steps {
-                echo "\n====================================="
-                echo "ETAP: STATIC CODE ANALYSIS"
-                echo "Analiza kodu z SonarQube"
-                echo "====================================="
-                withSonarQubeEnv(installationName: 'jenkins'){
-                     sh './mvnw sonar:sonar'
-                }
-            }
-        }
+//         stage('STATIC CODE ANALYSIS') {
+//             steps {
+//                 echo "\n====================================="
+//                 echo "ETAP: STATIC CODE ANALYSIS"
+//                 echo "Analiza kodu z SonarQube"
+//                 echo "====================================="
+//                 withSonarQubeEnv(installationName: 'jenkins'){
+//                      sh './mvnw sonar:sonar'
+//                 }
+//             }
+//         }
 
         stage('FREE PORTS') {
             steps {

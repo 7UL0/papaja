@@ -51,6 +51,8 @@ services:
     volumes:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_logs:/opt/sonarqube/logs
+    networks:
+      - jenkins-net
 
 volumes:
   db-data:
