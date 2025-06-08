@@ -60,8 +60,8 @@ pipeline {
                 echo "ETAP: STATIC CODE ANALYSIS"
                 echo "Analiza kodu z SonarQube"
                 echo "====================================="
-                withSonarQubeEnv('Local Sonar') {
-                    sh './mvnw sonar:sonar'
+                withSonarQubeEnv(installationName: 'jenkins'){
+                     sh './mvnw sonar:sonar'
                 }
             }
         }
