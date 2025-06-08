@@ -44,7 +44,7 @@ pipeline {
                     echo "🔍 SPRAWDZANIE I UBIJANIE KONTENERÓW NA PORTACH"
                     echo "====================================="
 
-                    def ports = ['8088', '55432']
+                    def ports = ['8088', '5432']
                     ports.each { port ->
                         def containerId = sh(
                             script: "docker ps --filter 'publish=${port}' --format '{{.ID}}' || true",
