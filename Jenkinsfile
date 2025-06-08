@@ -37,6 +37,34 @@ pipeline {
             }
         }
 
+        stage('Free up used ports') {
+            steps {
+                script {
+                    echo "\n====================================="
+                    echo "🔍 CHECKING & FREEING USED PORTS"
+                    echo "====================================="
+
+                    def portsToCheck = ['8088', '55432']
+                    portsToCheck.each { port ->
+                        def output = sh(script: "lsof -i :${port} -t || true", returnStdout: true).trim()
+                        if (output) {
+                            echo "⚠️ Port ${port} is in use by PID(s): ${output}"
+                            def containers = sh(script: "docker ps -q --filter 'publish=${port}'", returnStdout: true).trim()
+                            if (containers) {
+                                echo "🔨 Killing container(s) using port ${port}: ${containers}"
+                                sh "docker kill ${containers} || true"
+                                sh "docker rm ${containers} || true"
+                            } else {
+                                echo "⚠️ No Docker container found, but process still using port ${port}"
+                            }
+                        } else {
+                            echo "✅ Port ${port} is free"
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Build Docker image') {
             steps {
                 script {
