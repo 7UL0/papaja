@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        VERSION = "v${env.BUILD_NUMBER}"
+        VERSION = "1.0.0-${env.BUILD_NUMBER}"
     }
 
     stages {
@@ -51,6 +51,18 @@ pipeline {
                 echo "====================================="
                 sh 'chmod +x mvnw || true'
                 sh './mvnw clean package -DskipTests'
+            }
+        }
+
+        stage('STATIC CODE ANALYSIS') {
+            steps {
+                echo "\n====================================="
+                echo "ETAP: STATIC CODE ANALYSIS"
+                echo "Analiza kodu z SonarQube"
+                echo "====================================="
+                withSonarQubeEnv('Local Sonar') {
+                    sh './mvnw sonar:sonar'
+                }
             }
         }
 
@@ -123,7 +135,7 @@ pipeline {
             mail to: 'papaja822@gmail.com',
                  subject: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                  body: """\
-    Gratulacje! Build zakończony sukcesem.
+    Gratulacje! Build wersji aplikacji ${VERSION} zakończony sukcesem.
 
     Podgląd aplikacji:
     http://localhost:8088
