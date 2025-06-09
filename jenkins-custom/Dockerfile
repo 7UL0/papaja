@@ -12,7 +12,7 @@ COPY gmail.crt /usr/local/share/ca-certificates/gmail.crt
 
 RUN update-ca-certificates && \
     keytool -import -alias gmailSMTP \
-           -keystore "$JAVA_HOME/lib/security/cacerts" \
+           -keystore /opt/java/openjdk/lib/security/cacerts \
            -file /usr/local/share/ca-certificates/gmail.crt \
            -storepass changeit -noprompt
 
